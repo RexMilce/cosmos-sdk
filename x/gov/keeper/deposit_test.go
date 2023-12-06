@@ -21,7 +21,7 @@ func TestDeposits(t *testing.T) {
 	TestAddrs := simtestutil.AddTestAddrsIncremental(bankKeeper, stakingKeeper, ctx, 2, sdk.NewInt(10000000))
 
 	tp := TestProposal
-	proposal, err := govKeeper.SubmitProposal(ctx, tp, "", "title", "description", TestAddrs[0])
+	proposal, err := govKeeper.SubmitProposal(ctx, tp, "", "title", "description", TestAddrs[0], false)
 	require.NoError(t, err)
 	proposalID := proposal.Id
 
@@ -105,7 +105,7 @@ func TestDeposits(t *testing.T) {
 	require.Equal(t, addr1Initial, bankKeeper.GetAllBalances(ctx, TestAddrs[1]))
 
 	// Test delete and burn deposits
-	proposal, err = govKeeper.SubmitProposal(ctx, tp, "", "title", "description", TestAddrs[0])
+	proposal, err = govKeeper.SubmitProposal(ctx, tp, "", "title", "description", TestAddrs[0], false)
 	require.NoError(t, err)
 	proposalID = proposal.Id
 	_, err = govKeeper.AddDeposit(ctx, proposalID, TestAddrs[0], fourStake)
@@ -121,6 +121,7 @@ func TestValidateInitialDeposit(t *testing.T) {
 		minDeposit               sdk.Coins
 		minInitialDepositPercent int64
 		initialDeposit           sdk.Coins
+		expedited                bool
 
 		expectError bool
 	}{
@@ -189,6 +190,18 @@ func TestValidateInitialDeposit(t *testing.T) {
 			minInitialDepositPercent: 0,
 			initialDeposit:           sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(baseDepositTestAmount*baseDepositTestPercent/100))),
 		},
+		"expedited min deposit * initial percent == initial deposit: success": {
+			minDeposit:               sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(baseDepositTestAmount))),
+			minInitialDepositPercent: baseDepositTestPercent,
+			initialDeposit:           sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(baseDepositTestAmount*baseDepositTestPercent/100))),
+			expedited:                true,
+		},
+		"expedited - 0 initial percent: success": {
+			minDeposit:               sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(baseDepositTestAmount))),
+			minInitialDepositPercent: 0,
+			initialDeposit:           sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(baseDepositTestAmount*baseDepositTestPercent/100))),
+			expedited:                true,
+		},
 	}
 
 	for name, tc := range testcases {
@@ -197,11 +210,16 @@ func TestValidateInitialDeposit(t *testing.T) {
 
 			params := v1.DefaultParams()
 			params.MinDeposit = tc.minDeposit
+			if tc.expedited {
+				params.ExpeditedMinDeposit = tc.minDeposit
+			} else {
+				params.MinDeposit = tc.minDeposit
+			}
 			params.MinInitialDepositRatio = sdk.NewDec(tc.minInitialDepositPercent).Quo(sdk.NewDec(100)).String()
 
 			govKeeper.SetParams(ctx, params)
 
-			err := govKeeper.ValidateInitialDeposit(ctx, tc.initialDeposit)
+			err := govKeeper.ValidateInitialDeposit(ctx, tc.initialDeposit, tc.expedited)
 
 			if tc.expectError {
 				require.Error(t, err)

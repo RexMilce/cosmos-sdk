@@ -27,10 +27,13 @@ func migrateParams(ctx sdk.Context, storeKey storetypes.StoreKey, legacySubspace
 	defaultParams := govv1.DefaultParams()
 	params := govv1.NewParams(
 		dp.MinDeposit,
+		defaultParams.ExpeditedMinDeposit,
 		*dp.MaxDepositPeriod,
 		*vp.VotingPeriod,
+		*defaultParams.ExpeditedVotingPeriod,
 		tp.Quorum,
 		tp.Threshold,
+		defaultParams.ExpeditedThreshold,
 		tp.VetoThreshold,
 		defaultParams.MinInitialDepositRatio,
 		defaultParams.BurnProposalDepositPrevote,

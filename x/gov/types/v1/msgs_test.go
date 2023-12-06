@@ -163,7 +163,7 @@ func TestMsgSubmitProposal_ValidateBasic(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		msg, err := v1.NewMsgSubmitProposal(tc.messages, tc.initialDeposit, tc.proposer, tc.metadata, tc.title, tc.summary)
+		msg, err := v1.NewMsgSubmitProposal(tc.messages, tc.initialDeposit, tc.proposer, tc.metadata, tc.title, tc.summary, false)
 		require.NoError(t, err)
 		if tc.expErr {
 			require.Error(t, msg.ValidateBasic(), "test: %s", tc.name)
@@ -200,7 +200,7 @@ func TestMsgSubmitProposal_GetSignBytes(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			msg, err := v1.NewMsgSubmitProposal(tc.proposal, sdk.NewCoins(), sdk.AccAddress{}.String(), "", tc.title, tc.summary)
+			msg, err := v1.NewMsgSubmitProposal(tc.proposal, sdk.NewCoins(), sdk.AccAddress{}.String(), "", tc.title, tc.summary, false)
 			require.NoError(t, err)
 			var bz []byte
 			require.NotPanics(t, func() {

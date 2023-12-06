@@ -170,18 +170,18 @@ func TestParseSubmitProposal(t *testing.T) {
 	badJSON := testutil.WriteToNewTempFile(t, "bad json")
 
 	// nonexistent json
-	_, _, _, _, _, err := parseSubmitProposal(cdc, "fileDoesNotExist") //nolint: dogsled
+	_, _, _, err := parseSubmitProposal(cdc, "fileDoesNotExist") //nolint: dogsled
 	require.Error(t, err)
 
 	// invalid json
-	_, _, _, _, _, err = parseSubmitProposal(cdc, badJSON.Name()) //nolint: dogsled
+	_, _, _, err = parseSubmitProposal(cdc, badJSON.Name()) //nolint: dogsled
 	require.Error(t, err)
 
 	// ok json
-	msgs, metadata, title, summary, deposit, err := parseSubmitProposal(cdc, okJSON.Name())
+	proposal, msgs, deposit, err := parseSubmitProposal(cdc, okJSON.Name())
 	require.NoError(t, err, "unexpected error")
 	require.Equal(t, sdk.NewCoins(sdk.NewCoin("test", sdk.NewInt(1000))), deposit)
-	require.Equal(t, base64.StdEncoding.EncodeToString(expectedMetadata), metadata)
+	require.Equal(t, base64.StdEncoding.EncodeToString(expectedMetadata), proposal.Metadata)
 	require.Len(t, msgs, 3)
 	msg1, ok := msgs[0].(*banktypes.MsgSend)
 	require.True(t, ok)
@@ -200,8 +200,8 @@ func TestParseSubmitProposal(t *testing.T) {
 	require.True(t, ok)
 	require.Equal(t, "My awesome title", textProp.Title)
 	require.Equal(t, "My awesome description", textProp.Description)
-	require.Equal(t, "My awesome title", title)
-	require.Equal(t, "My awesome summary", summary)
+	require.Equal(t, "My awesome title", proposal.Title)
+	require.Equal(t, "My awesome summary", proposal.Summary)
 
 	err = okJSON.Close()
 	require.Nil(t, err, "unexpected error")

@@ -9,17 +9,18 @@ const (
 	EventTypeActiveProposal   = "active_proposal"
 	EventTypeSignalProposal   = "signal_proposal"
 
-	AttributeKeyVoter              = "voter"
-	AttributeKeyProposalResult     = "proposal_result"
-	AttributeKeyOption             = "option"
-	AttributeKeyProposalID         = "proposal_id"
-	AttributeKeyProposalMessages   = "proposal_messages" // Msg type_urls in the proposal
-	AttributeKeyVotingPeriodStart  = "voting_period_start"
-	AttributeValueProposalDropped  = "proposal_dropped"  // didn't meet min deposit
-	AttributeValueProposalPassed   = "proposal_passed"   // met vote quorum
-	AttributeValueProposalRejected = "proposal_rejected" // didn't meet vote quorum
-	AttributeValueProposalFailed   = "proposal_failed"   // error on proposal handler
-	AttributeKeyProposalType       = "proposal_type"
-	AttributeSignalTitle           = "signal_title"
-	AttributeSignalDescription     = "signal_description"
+	AttributeKeyProposalResult       = "proposal_result"
+	AttributeKeyOption               = "option"
+	AttributeKeyProposalID           = "proposal_id"
+	AttributeKeyProposalMessages     = "proposal_messages" // Msg type_urls in the proposal
+	AttributeKeyVotingPeriodStart    = "voting_period_start"
+	AttributeValueProposalDropped    = "proposal_dropped"             // didn't meet min deposit
+	AttributeValueProposalPassed     = "proposal_passed"              // met vote quorum
+	AttributeValueProposalRejected   = "proposal_rejected"            // didn't meet vote quorum
+	AttributeValueExpeditedConverted = "expedited_proposal_converted" // didn't pass expedition and converted to regular proposal
+	AttributeValueProposalFailed     = "proposal_failed"              // error on proposal handler
+	AttributeKeyProposalType         = "proposal_type"
+	AttributeSignalTitle             = "signal_title"
+	AttributeSignalDescription       = "signal_description"
+	AttributeKeyVoter                = "voter"
 )

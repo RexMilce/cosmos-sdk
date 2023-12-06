@@ -2,6 +2,7 @@ package simulation_test
 
 import (
 	"encoding/json"
+	"gotest.tools/v3/assert"
 	"math/rand"
 	"testing"
 
@@ -29,6 +30,7 @@ func TestRandomizedGenState(t *testing.T) {
 	simState := module.SimulationState{
 		AppParams:    make(simtypes.AppParams),
 		Cdc:          cdc,
+		BondDenom:    "stake",
 		Rand:         r,
 		NumBonded:    3,
 		Accounts:     simtypes.RandomAccounts(r, 3),
@@ -42,22 +44,26 @@ func TestRandomizedGenState(t *testing.T) {
 	simState.Cdc.MustUnmarshalJSON(simState.GenState[types.ModuleName], &govGenesis)
 
 	const (
-		tallyQuorum          = "0.400000000000000000"
-		tallyThreshold       = "0.539000000000000000"
-		tallyVetoThreshold   = "0.314000000000000000"
-		minInitialDepositDec = "0.590000000000000000"
+		tallyQuorum             = "0.466000000000000000"
+		tallyThreshold          = "0.524000000000000000"
+		tallyExpeditedThreshold = "0.511000000000000000"
+		tallyVetoThreshold      = "0.291000000000000000"
+		minInitialDepositDec    = "0.880000000000000000"
 	)
 
-	require.Equal(t, "905stake", govGenesis.Params.MinDeposit[0].String())
-	require.Equal(t, "77h26m10s", govGenesis.Params.MaxDepositPeriod.String())
-	require.Equal(t, float64(275567), govGenesis.Params.VotingPeriod.Seconds())
-	require.Equal(t, tallyQuorum, govGenesis.Params.Quorum)
-	require.Equal(t, tallyThreshold, govGenesis.Params.Threshold)
-	require.Equal(t, tallyVetoThreshold, govGenesis.Params.VetoThreshold)
-	require.Equal(t, uint64(0x28), govGenesis.StartingProposalId)
-	require.Equal(t, []*v1.Deposit{}, govGenesis.Deposits)
-	require.Equal(t, []*v1.Vote{}, govGenesis.Votes)
-	require.Equal(t, []*v1.Proposal{}, govGenesis.Proposals)
+	assert.Equal(t, "272stake", govGenesis.Params.MinDeposit[0].String())
+	assert.Equal(t, "800stake", govGenesis.Params.ExpeditedMinDeposit[0].String())
+	assert.Equal(t, "41h11m36s", govGenesis.Params.MaxDepositPeriod.String())
+	assert.Equal(t, float64(135894), govGenesis.Params.VotingPeriod.Seconds())
+	assert.Equal(t, float64(115820), govGenesis.Params.ExpeditedVotingPeriod.Seconds())
+	assert.Equal(t, tallyQuorum, govGenesis.Params.Quorum)
+	assert.Equal(t, tallyThreshold, govGenesis.Params.Threshold)
+	assert.Equal(t, tallyExpeditedThreshold, govGenesis.Params.ExpeditedThreshold)
+	assert.Equal(t, tallyVetoThreshold, govGenesis.Params.VetoThreshold)
+	assert.Equal(t, uint64(0x28), govGenesis.StartingProposalId)
+	assert.DeepEqual(t, []*v1.Deposit{}, govGenesis.Deposits)
+	assert.DeepEqual(t, []*v1.Vote{}, govGenesis.Votes)
+	assert.DeepEqual(t, []*v1.Proposal{}, govGenesis.Proposals)
 }
 
 // TestRandomizedGenState tests abnormal scenarios of applying RandomizedGenState.
